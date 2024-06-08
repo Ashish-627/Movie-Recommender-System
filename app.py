@@ -2,7 +2,8 @@ import pickle
 import streamlit as st
 import requests
 import pandas as pd
-
+import bz2
+import _pickle as cPickle
 
 
 def fetch_poster(movie_id):
@@ -26,11 +27,15 @@ def recommend(movie):
 
     return recommended_movie_names,recommended_movie_posters
 
-
+# Load any compressed pickle file
+def decompress_pickle(file):
+  data = bz2.BZ2File(file, "rb")
+  data = cPickle.load(data)
+  return data
 st.header('Movie Recommender System')
 movies_dict = pickle.load(open('movies_dict.pkl', 'rb'))
 movies=pd.DataFrame(movies_dict)
-similarity = pickle.load(open('similarity.pkl','rb'))
+similarity = decompress_pickle('similarity.pbz2')
 
 selected_movie_name = st.selectbox(
     "Type or select a movie from the dropdown",
